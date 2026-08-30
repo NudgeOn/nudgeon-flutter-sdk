@@ -1,0 +1,28 @@
+name: onda_flutter
+description: Onda 고객 인게이지먼트 플랫폼 Flutter SDK (네이티브 코어 브리지)
+version: 0.1.0
+homepage: https://github.com/ondahq/onda-flutter-sdk
+publish_to: none # M4 배포 전까지
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+  flutter: ">=3.19.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  plugin_platform_interface: ^2.1.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+# Federated plugin 구조 (PRD-01A 3.4): onda_flutter / _ios / _android
+flutter:
+  plugin:
+    platforms:
+      ios:
+        pluginClass: OndaFlutterPlugin
+      android:
+        package: io.onda.flutter
+        pluginClass: OndaFlutterPlugin
