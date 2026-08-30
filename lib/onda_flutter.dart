@@ -1,7 +1,5 @@
 /// Onda Flutter SDK (PRD-01A 3.4). 무상태 브리지 — 네이티브 코어에 MethodChannel
 /// 호출 + EventChannel 스트림만 전달한다. 상태는 네이티브 코어에만 (PRD-01A 1.1).
-///
-/// 상태: M3 골격 (코어 API 동결 후 착수). MethodChannel 배선은 구현 예정.
 library onda_flutter;
 
 import 'dart:async';
@@ -57,9 +55,31 @@ class PushPayload {
 
 enum PushPermissionResult { granted, denied, provisional }
 
+/// 구독 상태 (PRD-01A 2.4)
+class SubscriptionState {
+  final bool serviceOptIn;
+  final String osPermission;
+  final bool tokenRegistered;
+
+  SubscriptionState.fromMap(Map<dynamic, dynamic> m)
+      : serviceOptIn = (m['serviceOptIn'] ?? true) as bool,
+        osPermission = (m['osPermission'] ?? 'not_determined') as String,
+        tokenRegistered = (m['tokenRegistered'] ?? false) as bool;
+}
+
 /// 공개 API — iOS/Android와 완전 동형 (PRD-01A 2장)
 class Onda {
   static const MethodChannel _channel = MethodChannel('io.onda/methods');
+  static const EventChannel _events = EventChannel('io.onda/events');
+
+  /// {event, payload} 브로드캐스트 — 구독 시 네이티브 StreamHandler가 버퍼(최대 20건) 재생
+  /// (콜드 스타트 유실 0 — Flutter에서 가장 흔히 깨지는 지점, PRD-01A 2.5).
+  static Stream<Map<dynamic, dynamic>> get _stream =>
+      _events.receiveBroadcastStream().cast<Map<dynamic, dynamic>>();
+
+  static Stream<PushPayload> _filtered(String event) => _stream
+      .where((e) => e['event'] == event)
+      .map((e) => PushPayload.fromMap(e['payload'] as Map<dynamic, dynamic>));
 
   static Future<void> initialize(OndaConfig config) =>
       _channel.invokeMethod('initialize', config.toMap());
@@ -77,6 +97,7 @@ class Onda {
 
   static Future<void> flush() => _channel.invokeMethod('flush');
 
+  // 푸시
   static Future<PushPermissionResult> registerForPush() async {
     final r = await _channel.invokeMethod<String>('registerForPush');
     return PushPermissionResult.values.firstWhere(
@@ -88,11 +109,24 @@ class Onda {
   static Future<void> setPushSubscription(bool optedIn) =>
       _channel.invokeMethod('setPushSubscription', {'optedIn': optedIn});
 
-  /// 콜드 스타트 — 푸시로 앱이 열렸으면 payload, 아니면 null (유실 0 요구, PRD-01A 3.4)
+  static Future<SubscriptionState> getPushSubscription() async {
+    final m = await _channel.invokeMethod<Map<dynamic, dynamic>>('getPushSubscription');
+    return SubscriptionState.fromMap(m ?? {});
+  }
+
+  // 리스너 (콜드 스타트 유실 0)
+  static Stream<PushPayload> get onPushOpened => _filtered('pushOpened');
+  static Stream<PushPayload> get onPushReceived => _filtered('pushReceived');
+
+  /// 콜드 스타트 — 푸시로 앱이 열렸으면 payload, 아니면 null (이중 경로).
   static Future<PushPayload?> getInitialPushPayload() async {
     final m = await _channel.invokeMethod<Map<dynamic, dynamic>>('getInitialPushPayload');
     return m == null ? null : PushPayload.fromMap(m);
   }
 
-  // onPushOpened 스트림(EventChannel)은 M3 구현
+  // 유틸리티
+  static Future<String?> getDeviceId() => _channel.invokeMethod<String>('getDeviceId');
+  static Future<String?> getAnonId() => _channel.invokeMethod<String>('getAnonId');
+  static Future<void> setLogLevel(String level) =>
+      _channel.invokeMethod('setLogLevel', {'level': level});
 }
