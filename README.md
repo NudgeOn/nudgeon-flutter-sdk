@@ -39,4 +39,4 @@ final initial = await Onda.getInitialPushPayload(); // 이중 경로
 - **무상태 브리지** — 상태는 네이티브 코어에만. MethodChannel 호출 + EventChannel 스트림.
 - Federated plugin: `onda_flutter` / `onda_flutter_ios` / `onda_flutter_android`.
 
-MIT License.
+Apache License 2.0. See [LICENSE](LICENSE).
