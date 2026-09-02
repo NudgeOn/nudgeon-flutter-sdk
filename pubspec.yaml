@@ -1,7 +1,7 @@
-name: onda_flutter
-description: Onda 고객 인게이지먼트 플랫폼 Flutter SDK (네이티브 코어 브리지)
+name: nudgeon_flutter
+description: NudgeOn 고객 인게이지먼트 플랫폼 Flutter SDK (네이티브 코어 브리지)
 version: 0.1.0
-homepage: https://github.com/ondahq/onda-flutter-sdk
+homepage: https://github.com/nudgeon/nudgeon-flutter-sdk
 publish_to: none # M4 배포 전까지
 
 environment:
@@ -17,12 +17,12 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-# Federated plugin 구조 (PRD-01A 3.4): onda_flutter / _ios / _android
+# Federated plugin 구조 (PRD-01A 3.4): nudgeon_flutter / _ios / _android
 flutter:
   plugin:
     platforms:
       ios:
-        pluginClass: OndaFlutterPlugin
+        pluginClass: NudgeOnFlutterPlugin
       android:
-        package: io.onda.flutter
-        pluginClass: OndaFlutterPlugin
+        package: io.nudgeon.flutter
+        pluginClass: NudgeOnFlutterPlugin

@@ -1,33 +1,33 @@
 import Flutter
-import OndaSDK
+import NudgeOnSDK
 import UIKit
 
-/// Flutter 브리지 (iOS) — 무상태. MethodChannel 호출을 OndaSDK 코어로 위임하고,
+/// Flutter 브리지 (iOS) — 무상태. MethodChannel 호출을 NudgeOnSDK 코어로 위임하고,
 /// EventChannel로 pushOpened/received를 스트리밍한다 (PRD-01A 3.4·4장).
-public class OndaFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
+public class NudgeOnFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
   private var sink: FlutterEventSink?
   private var openedToken: UUID?
   private var receivedToken: UUID?
 
   public static func register(with registrar: FlutterPluginRegistrar) {
-    let instance = OndaFlutterPlugin()
-    let methods = FlutterMethodChannel(name: "io.onda/methods", binaryMessenger: registrar.messenger())
+    let instance = NudgeOnFlutterPlugin()
+    let methods = FlutterMethodChannel(name: "io.nudgeon/methods", binaryMessenger: registrar.messenger())
     registrar.addMethodCallDelegate(instance, channel: methods)
-    let events = FlutterEventChannel(name: "io.onda/events", binaryMessenger: registrar.messenger())
+    let events = FlutterEventChannel(name: "io.nudgeon/events", binaryMessenger: registrar.messenger())
     events.setStreamHandler(instance)
   }
 
   // MARK: EventChannel — 구독 시 코어 EventBus가 버퍼(최대 20건) 재생 (콜드 스타트 유실 0)
   public func onListen(withArguments _: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
     sink = events
-    openedToken = Onda.onPushOpened { [weak self] p in self?.forward("pushOpened", p) }
-    receivedToken = Onda.onPushReceived { [weak self] p in self?.forward("pushReceived", p) }
+    openedToken = NudgeOn.onPushOpened { [weak self] p in self?.forward("pushOpened", p) }
+    receivedToken = NudgeOn.onPushReceived { [weak self] p in self?.forward("pushReceived", p) }
     return nil
   }
 
   public func onCancel(withArguments _: Any?) -> FlutterError? {
-    if let t = openedToken { Onda.off(t) }
-    if let t = receivedToken { Onda.off(t) }
+    if let t = openedToken { NudgeOn.off(t) }
+    if let t = receivedToken { NudgeOn.off(t) }
     sink = nil
     return nil
   }
@@ -43,25 +43,25 @@ public class OndaFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
     case "initialize":
       guard let key = args["sdkKey"] as? String, let host = args["apiHost"] as? String,
             let url = URL(string: host) else { result(FlutterError(code: "E_ARGS", message: "initialize 인자 오류", details: nil)); return }
-      Onda.initialize(config: OndaConfig(sdkKey: key, apiHost: url)); result(nil)
-    case "identify": Onda.identify(externalId: args["externalId"] as? String ?? ""); result(nil)
-    case "reset": Onda.reset(); result(nil)
+      NudgeOn.initialize(config: NudgeOnConfig(sdkKey: key, apiHost: url)); result(nil)
+    case "identify": NudgeOn.identify(externalId: args["externalId"] as? String ?? ""); result(nil)
+    case "reset": NudgeOn.reset(); result(nil)
     case "setUserAttributes":
-      Onda.setUserAttributes(Self.values(args["attrs"] as? [String: Any] ?? [:])); result(nil)
+      NudgeOn.setUserAttributes(Self.values(args["attrs"] as? [String: Any] ?? [:])); result(nil)
     case "track":
-      Onda.track(args["name"] as? String ?? "", properties: args["properties"] as? [String: Any]); result(nil)
-    case "flush": Onda.flush(); result(nil)
-    case "setPushSubscription": Onda.setPushSubscription(args["optedIn"] as? Bool ?? true); result(nil)
+      NudgeOn.track(args["name"] as? String ?? "", properties: args["properties"] as? [String: Any]); result(nil)
+    case "flush": NudgeOn.flush(); result(nil)
+    case "setPushSubscription": NudgeOn.setPushSubscription(args["optedIn"] as? Bool ?? true); result(nil)
     case "setLogLevel": result(nil)
-    case "getDeviceId": result(Onda.getDeviceId())
-    case "getAnonId": result(Onda.getAnonId())
+    case "getDeviceId": result(NudgeOn.getDeviceId())
+    case "getAnonId": result(NudgeOn.getAnonId())
     case "getInitialPushPayload":
-      result(Onda.getInitialPushPayload().map { Self.payloadMap($0) })
+      result(NudgeOn.getInitialPushPayload().map { Self.payloadMap($0) })
     case "registerForPush":
-      Task { let r = await Onda.registerForPush(); result(r.rawValue) }
+      Task { let r = await NudgeOn.registerForPush(); result(r.rawValue) }
     case "getPushSubscription":
       Task {
-        let s = await Onda.getPushSubscription()
+        let s = await NudgeOn.getPushSubscription()
         result(["serviceOptIn": s.serviceOptIn, "osPermission": s.osPermission, "tokenRegistered": s.tokenRegistered])
       }
     default: result(FlutterMethodNotImplemented)
@@ -76,7 +76,7 @@ public class OndaFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
     return d
   }
 
-  private static func values(_ raw: [String: Any]) -> [String: OndaValue] {
+  private static func values(_ raw: [String: Any]) -> [String: NudgeOnValue] {
     raw.mapValues { v in
       switch v {
       case let s as String: return .string(s)

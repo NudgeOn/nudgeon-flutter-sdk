@@ -1,5 +1,5 @@
-// Flutter Android 플러그인 (PRD-01A 3.4). 네이티브 코어(io.onda:onda-android)에 위임.
-group = "io.onda.flutter"
+// Flutter Android 플러그인 (PRD-01A 3.4). 네이티브 코어(io.nudgeon:nudgeon-android)에 위임.
+group = "io.nudgeon.flutter"
 version = "0.1.0"
 
 buildscript {
@@ -18,7 +18,7 @@ apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
 
 android {
-  namespace "io.onda.flutter"
+  namespace "io.nudgeon.flutter"
   compileSdk 34
   defaultConfig { minSdk 26 }
   compileOptions {
@@ -30,5 +30,5 @@ android {
 }
 
 dependencies {
-  implementation "io.onda:onda-android:0.1.0" // Onda Android 코어
+  implementation "io.nudgeon:nudgeon-android:0.1.0" // NudgeOn Android 코어
 }

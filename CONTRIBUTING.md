@@ -1,6 +1,6 @@
-# Contributing to the Onda Flutter SDK
+# Contributing to the NudgeOn Flutter SDK
 
-Thank you for contributing to Onda.
+Thank you for contributing to NudgeOn.
 
 ## License for contributions
 

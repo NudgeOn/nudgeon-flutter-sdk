@@ -1,12 +1,12 @@
-/// Onda Flutter SDK (PRD-01A 3.4). 무상태 브리지 — 네이티브 코어에 MethodChannel
+/// NudgeOn Flutter SDK (PRD-01A 3.4). 무상태 브리지 — 네이티브 코어에 MethodChannel
 /// 호출 + EventChannel 스트림만 전달한다. 상태는 네이티브 코어에만 (PRD-01A 1.1).
-library onda_flutter;
+library nudgeon_flutter;
 
 import 'dart:async';
 import 'package:flutter/services.dart';
 
 /// SDK 설정 (PRD-01A 2.1)
-class OndaConfig {
+class NudgeOnConfig {
   final String sdkKey;
   final String apiHost; // 셀프호스팅 시 교체
   final int flushInterval;
@@ -14,7 +14,7 @@ class OndaConfig {
   final bool autoTrackSessions;
   final bool autoRegisterPushToken;
 
-  const OndaConfig({
+  const NudgeOnConfig({
     required this.sdkKey,
     required this.apiHost,
     this.flushInterval = 10,
@@ -68,9 +68,9 @@ class SubscriptionState {
 }
 
 /// 공개 API — iOS/Android와 완전 동형 (PRD-01A 2장)
-class Onda {
-  static const MethodChannel _channel = MethodChannel('io.onda/methods');
-  static const EventChannel _events = EventChannel('io.onda/events');
+class NudgeOn {
+  static const MethodChannel _channel = MethodChannel('io.nudgeon/methods');
+  static const EventChannel _events = EventChannel('io.nudgeon/events');
 
   /// {event, payload} 브로드캐스트 — 구독 시 네이티브 StreamHandler가 버퍼(최대 20건) 재생
   /// (콜드 스타트 유실 0 — Flutter에서 가장 흔히 깨지는 지점, PRD-01A 2.5).
@@ -81,7 +81,7 @@ class Onda {
       .where((e) => e['event'] == event)
       .map((e) => PushPayload.fromMap(e['payload'] as Map<dynamic, dynamic>));
 
-  static Future<void> initialize(OndaConfig config) =>
+  static Future<void> initialize(NudgeOnConfig config) =>
       _channel.invokeMethod('initialize', config.toMap());
 
   static Future<void> identify(String externalId) =>
