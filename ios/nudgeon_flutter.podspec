@@ -4,7 +4,7 @@ Pod::Spec.new do |s|
   s.summary          = "NudgeOn 고객 인게이지먼트 플랫폼 Flutter SDK (네이티브 코어 브리지)"
   s.license          = { :type => "Apache-2.0", :file => "../LICENSE" }
   s.author           = { "NudgeOn" => "dev@nudgeon.io" }
-  s.homepage         = "https://github.com/nudgeon/nudgeon-flutter-sdk"
+  s.homepage         = "https://github.com/NudgeOn/nudgeon-flutter-sdk"
   s.source           = { :path => "." }
   s.source_files     = "Classes/**/*"
   s.platform         = :ios, "15.0"
