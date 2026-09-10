@@ -41,7 +41,11 @@ class PushPayload {
   final String title;
   final String body;
   final String? deepLink;
+  /// 리치 알림 이미지 URL — 네이티브 SDK가 표시(iOS NSE 첨부·Android BigPicture)한다.
+  final String? imageUrl;
   final Map<String, dynamic> data;
+  /// 무음(백그라운드) 푸시. 네이티브가 소비하므로 리스너에는 오지 않는다 — 형태 대칭용.
+  final bool silent;
 
   PushPayload.fromMap(Map<dynamic, dynamic> m)
       : messageId = m['messageId'] as String,
@@ -50,7 +54,9 @@ class PushPayload {
         title = (m['title'] ?? '') as String,
         body = (m['body'] ?? '') as String,
         deepLink = m['deepLink'] as String?,
-        data = Map<String, dynamic>.from(m['data'] ?? {});
+        imageUrl = m['imageUrl'] as String?,
+        data = Map<String, dynamic>.from(m['data'] ?? {}),
+        silent = (m['silent'] as bool?) ?? false;
 }
 
 enum PushPermissionResult { granted, denied, provisional }

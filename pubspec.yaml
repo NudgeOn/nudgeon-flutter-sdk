@@ -1,6 +1,6 @@
 name: nudgeon_flutter
 description: NudgeOn 고객 인게이지먼트 플랫폼 Flutter SDK (네이티브 코어 브리지)
-version: 0.1.0
+version: 0.1.2
 homepage: https://github.com/NudgeOn/nudgeon-flutter-sdk
 repository: https://github.com/NudgeOn/nudgeon-flutter-sdk
 issue_tracker: https://github.com/NudgeOn/nudgeon-flutter-sdk/issues

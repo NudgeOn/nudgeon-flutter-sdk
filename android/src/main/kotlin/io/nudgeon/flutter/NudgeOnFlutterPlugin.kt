@@ -94,6 +94,8 @@ class NudgeOnFlutterPlugin : FlutterPlugin, MethodCallHandler, EventChannel.Stre
     put("title", p.title)
     put("body", p.body)
     p.deepLink?.let { put("deepLink", it) }
+    p.imageUrl?.let { put("imageUrl", it) }
+    put("silent", p.silent)
     put("data", p.data)
   }
 }

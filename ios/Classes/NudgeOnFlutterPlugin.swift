@@ -73,6 +73,8 @@ public class NudgeOnFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
     if let c = p.campaignId { d["campaignId"] = c }
     if let j = p.journeyId { d["journeyId"] = j }
     if let l = p.deepLink { d["deepLink"] = l }
+    if let i = p.imageUrl { d["imageUrl"] = i }
+    d["silent"] = p.silent
     return d
   }
 
