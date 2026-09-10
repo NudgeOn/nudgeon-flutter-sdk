@@ -31,12 +31,17 @@ final initial = await NudgeOn.getInitialPushPayload(); // 이중 경로
 ## 네이티브 배선
 
 - iOS: `ios/Classes/NudgeOnFlutterPlugin.swift`(MethodChannel + EventChannel StreamHandler) — `NudgeOnSDK` 코어 위임.
-- Android: `android/.../NudgeOnFlutterPlugin.kt` — `io.nudgeon:nudgeon-android` 코어 위임.
+- Android: `android/.../NudgeOnFlutterPlugin.kt` — `io.nudgeon:nudgeon-sdk` 코어 위임.
 - 브리지 무상태: `io.nudgeon/methods`(invoke) + `io.nudgeon/events`({event,payload} 스트림) (PRD-01A 4장).
 
 ## 아키텍처 (PRD-01A 1.1 · 3.4)
 
 - **무상태 브리지** — 상태는 네이티브 코어에만. MethodChannel 호출 + EventChannel 스트림.
 - Federated plugin: `nudgeon_flutter` / `nudgeon_flutter_ios` / `nudgeon_flutter_android`.
+
+## 게시 (메인테이너)
+
+- **최초 1회**는 pub.dev 정책상 수동: Flutter가 있는 머신에서 `flutter pub publish` (게시자 계정 필요). 게시 뒤 pub.dev 패키지 관리 페이지에서 *Automated publishing → GitHub Actions* 를 `NudgeOn/nudgeon-flutter-sdk`, 태그 패턴 `{{version}}` 로 켠다.
+- 그 뒤부터는 `pubspec.yaml` 버전을 올려 머지하고 태그 `X.Y.Z`를 푸시하면 **Publish to pub.dev** 워크플로가 OIDC로 게시한다(시크릿 없음). CI는 매 PR에서 `pub publish --dry-run`으로 게시 가능 상태를 확인한다.
 
 Apache License 2.0. See [LICENSE](LICENSE).

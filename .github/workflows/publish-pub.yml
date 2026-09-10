@@ -1,0 +1,55 @@
+name: Publish to pub.dev
+
+# 태그 X.Y.Z 푸시 → pub.dev 자동 게시. 시크릿 없음 — pub.dev의 "Automated publishing"(GitHub Actions, OIDC)을
+# 패키지 관리 페이지에서 이 저장소·태그 패턴으로 켜 두어야 한다. 최초 1회 게시는 pub.dev 정책상 수동
+# (`flutter pub publish`)이며, 그 뒤부터 이 워크플로가 동작한다.
+on:
+  push:
+    tags: ["[0-9]+.[0-9]+.[0-9]+"]
+
+permissions:
+  id-token: write # pub.dev OIDC
+  contents: read
+
+jobs:
+  publish:
+    name: 검증 · pub publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.38.5
+          cache: true
+
+      - name: 태그 = pubspec 버전 확인
+        run: |
+          V=$(sed -n 's/^version: *//p' pubspec.yaml)
+          [ "$V" = "$GITHUB_REF_NAME" ] || { echo "::error::태그 $GITHUB_REF_NAME ≠ pubspec.yaml $V"; exit 1; }
+
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+
+      - name: 이미 게시된 버전이면 건너뜀
+        id: exists
+        run: |
+          V=$(sed -n 's/^version: *//p' pubspec.yaml)
+          if curl -fsS "https://pub.dev/api/packages/nudgeon_flutter" | grep -q "\"version\":\"$V\""; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"; echo "::notice::nudgeon_flutter $V 는 이미 pub.dev에 있습니다"
+          fi
+
+      - name: pub.dev OIDC 토큰 교환
+        if: steps.exists.outputs.skip != 'true'
+        run: |
+          PUB_TOKEN=$(curl -fsS "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=https://pub.dev" \
+            -H "Authorization: Bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" | jq -r .value)
+          echo "::add-mask::$PUB_TOKEN"
+          echo "PUB_TOKEN=$PUB_TOKEN" >> "$GITHUB_ENV"
+          dart pub token add https://pub.dev --env-var PUB_TOKEN
+
+      - name: pub publish
+        if: steps.exists.outputs.skip != 'true'
+        run: flutter pub publish --force
