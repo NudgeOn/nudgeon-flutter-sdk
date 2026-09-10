@@ -31,3 +31,7 @@ jobs:
 
       - name: Test
         run: flutter test
+
+      # pub.dev 게시 가능 상태를 매 PR에서 확인한다 (경고는 허용, 오류만 실패).
+      - name: Publish dry-run
+        run: flutter pub publish --dry-run
