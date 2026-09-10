@@ -54,6 +54,20 @@ void main() {
     expect(p?.data['k'], 'v');
   });
 
+  test('PushPayload는 imageUrl·silent를 읽고 없으면 null/false', () async {
+    reply = {
+      'messageId': 'm2', 'title': 't', 'body': 'b', 'data': {},
+      'imageUrl': 'https://x/i.png', 'silent': false,
+    };
+    final rich = await NudgeOn.getInitialPushPayload();
+    expect(rich?.imageUrl, 'https://x/i.png');
+    expect(rich?.silent, false);
+    reply = {'messageId': 'm3', 'title': '', 'body': '', 'data': {}};
+    final plain = await NudgeOn.getInitialPushPayload();
+    expect(plain?.imageUrl, isNull);
+    expect(plain?.silent, false);
+  });
+
   test('getInitialPushPayload null이면 null', () async {
     reply = null;
     expect(await NudgeOn.getInitialPushPayload(), isNull);
