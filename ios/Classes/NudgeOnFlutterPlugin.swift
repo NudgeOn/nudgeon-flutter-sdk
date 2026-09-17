@@ -8,6 +8,7 @@ public class NudgeOnFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
   private var sink: FlutterEventSink?
   private var openedToken: UUID?
   private var receivedToken: UUID?
+  private var events: Set<String> = []
 
   public static func register(with registrar: FlutterPluginRegistrar) {
     let instance = NudgeOnFlutterPlugin()
@@ -17,19 +18,35 @@ public class NudgeOnFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
     events.setStreamHandler(instance)
   }
 
-  // MARK: EventChannel — 구독 시 코어 EventBus가 버퍼(최대 20건) 재생 (콜드 스타트 유실 0)
+  // MARK: EventChannel — 구독 시 코어 EventBus가 버퍼(최대 20건) 재생 (이벤트별 네이티브 버퍼 재생)
   public func onListen(withArguments _: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+    clearSubscriptions()
     sink = events
-    openedToken = NudgeOn.onPushOpened { [weak self] p in self?.forward("pushOpened", p) }
-    receivedToken = NudgeOn.onPushReceived { [weak self] p in self?.forward("pushReceived", p) }
+    attachListeners()
     return nil
   }
 
   public func onCancel(withArguments _: Any?) -> FlutterError? {
-    if let t = openedToken { NudgeOn.off(t) }
-    if let t = receivedToken { NudgeOn.off(t) }
+    clearSubscriptions()
+    events.removeAll()
     sink = nil
     return nil
+  }
+
+  private func clearSubscriptions() {
+    if let t = openedToken { NudgeOn.off(t) }
+    if let t = receivedToken { NudgeOn.off(t) }
+    openedToken = nil; receivedToken = nil
+  }
+
+  private func attachListeners() {
+    guard sink != nil else { return }
+    if events.contains("pushOpened"), openedToken == nil { openedToken = NudgeOn.onPushOpened { [weak self] p in self?.forward("pushOpened", p) } }
+    if events.contains("pushReceived"), receivedToken == nil { receivedToken = NudgeOn.onPushReceived { [weak self] p in self?.forward("pushReceived", p) } }
+  }
+
+  public func detachFromEngine(for registrar: FlutterPluginRegistrar) {
+    _ = onCancel(withArguments: nil)
   }
 
   private func forward(_ event: String, _ p: PushPayload) {
@@ -40,19 +57,29 @@ public class NudgeOnFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     let args = call.arguments as? [String: Any] ?? [:]
     switch call.method {
+    case "subscribeEvent", "unsubscribeEvent":
+      guard let event = args["event"] as? String, ["pushOpened", "pushReceived"].contains(event) else { result(FlutterError(code: "E_ARGS", message: "event 인자 오류", details: nil)); return }
+      if call.method == "subscribeEvent" { events.insert(event); attachListeners() }
+      else {
+        events.remove(event)
+        if event == "pushOpened", let token = openedToken { NudgeOn.off(token); openedToken = nil }
+        if event == "pushReceived", let token = receivedToken { NudgeOn.off(token); receivedToken = nil }
+      }
+      result(nil)
     case "initialize":
-      guard let key = args["sdkKey"] as? String, let host = args["apiHost"] as? String,
-            let url = URL(string: host) else { result(FlutterError(code: "E_ARGS", message: "initialize 인자 오류", details: nil)); return }
-      NudgeOn.initialize(config: NudgeOnConfig(sdkKey: key, apiHost: url)); result(nil)
+      guard let config = NudgeOnFlutterValues.config(args) else { result(FlutterError(code: "E_ARGS", message: "initialize 인자 오류", details: nil)); return }
+      NudgeOn.initialize(config: config); attachListeners(); result(nil)
     case "identify": NudgeOn.identify(externalId: args["externalId"] as? String ?? ""); result(nil)
     case "reset": NudgeOn.reset(); result(nil)
     case "setUserAttributes":
-      NudgeOn.setUserAttributes(Self.values(args["attrs"] as? [String: Any] ?? [:])); result(nil)
+      NudgeOn.setUserAttributes(NudgeOnFlutterValues.values(args["attrs"] as? [String: Any] ?? [:])); result(nil)
     case "track":
       NudgeOn.track(args["name"] as? String ?? "", properties: args["properties"] as? [String: Any]); result(nil)
     case "flush": NudgeOn.flush(); result(nil)
     case "setPushSubscription": NudgeOn.setPushSubscription(args["optedIn"] as? Bool ?? true); result(nil)
-    case "setLogLevel": result(nil)
+    case "setLogLevel":
+      guard let level = NudgeOnFlutterValues.logLevel(args["level"] as? String ?? "") else { result(FlutterError(code: "E_ARGS", message: "logLevel 인자 오류", details: nil)); return }
+      NudgeOn.setLogLevel(level); result(nil)
     case "getDeviceId": result(NudgeOn.getDeviceId())
     case "getAnonId": result(NudgeOn.getAnonId())
     case "getInitialPushPayload":
@@ -78,15 +105,4 @@ public class NudgeOnFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
     return d
   }
 
-  private static func values(_ raw: [String: Any]) -> [String: NudgeOnValue] {
-    raw.mapValues { v in
-      switch v {
-      case let s as String: return .string(s)
-      case let b as Bool: return .bool(b)
-      case let n as NSNumber: return .number(n.doubleValue)
-      case let a as [String]: return .stringArray(a)
-      default: return .null
-      }
-    }
-  }
 }

@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "nudgeon-ios-sdk",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/NudgeOn/nudgeon-ios-sdk.git",
+      "state" : {
+        "revision" : "dcedd7deb245a2ad361a95cc73a7d2f1a5baa5af",
+        "version" : "0.2.2"
+      }
+    }
+  ],
+  "version" : 2
+}
