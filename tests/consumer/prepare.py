@@ -16,6 +16,9 @@ pubspec.write_text(s)
 subprocess.run(['flutter', 'pub', 'get'], cwd=app, check=True)
 android = app / 'android/app/build.gradle.kts'
 android.write_text(android.read_text().replace('minSdk = flutter.minSdkVersion', 'minSdk = 26'))
+if sys.platform != 'darwin':
+    print(app)
+    raise SystemExit(0)
 podfile = app / 'ios/Podfile'
 s = podfile.read_text().replace("# platform :ios, '13.0'", "platform :ios, '15.0'")
 s = s.replace("target 'Runner' do", "target 'Runner' do\n  pod 'NudgeOnSDK', :podspec => 'https://raw.githubusercontent.com/NudgeOn/nudgeon-ios-sdk/87da4258f7b8cbf27041d6b096815158cc0febee/NudgeOnSDK.podspec'")
