@@ -1,0 +1,1 @@
+{"outcome":"PASS","checks":{"identifiers":true,"reset_rotates_anon_preserves_device":true,"opened_buffer_survives_other_event_listener":true,"received_listener_before_initialization":true,"subscription_state":true,"ios_log_level":true},"scope":"simulated native callbacks; no APNs/device push"}
