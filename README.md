@@ -7,6 +7,40 @@ NudgeOn iOS/Android 네이티브 코어를 연결하는 Flutter 플러그인입�
 공개 SPM/Git 태그와 Maven Central에서 내려받습니다. CocoaPods trunk 등록도
 대기 중이므로 아래 고정 podspec 설정이 필요합니다.
 
+
+## 기본 이벤트 (Standard events — 다음 릴리스)
+
+`NudgeOnEvents`로 콘솔과 같은 이벤트 이름을 사용할 수 있습니다. 아래 상수는 이 소스에 추가된 API이며 기존 게시 버전에는 포함되어 있지 않습니다.
+SDK를 초기화한 뒤 해당 행동이 성공한 시점에 호출하세요. 예시는 서로 다른 호출 시점을 보여주며, 회원가입·로그인·구입을 한 번에 자동 수집하는 코드는 아닙니다.
+
+```dart
+import 'package:nudgeon_flutter/nudgeon_flutter.dart';
+
+// After SDK initialization and your app's authentication succeeds:
+await NudgeOn.identify('user-123');
+await NudgeOn.track(NudgeOnEvents.signUp, properties: {'method': 'email'});
+await NudgeOn.track(NudgeOnEvents.login, properties: {'method': 'email'});
+// After order/payment confirmation:
+await NudgeOn.track(NudgeOnEvents.purchaseCompleted, properties: {
+  'order_id': 'order-123', 'total_amount': 29000, 'currency': 'KRW', 'item_count': 1,
+});
+```
+
+| 상수 | 전송 이름 | 의미 | 권장 속성 |
+|---|---|---|---|
+| `NudgeOnEvents.signUp` | `sign_up` | 회원가입 | method |
+| `NudgeOnEvents.login` | `login` | 로그인 | method |
+| `NudgeOnEvents.purchaseCompleted` | `purchase_completed` | 구입 | order_id, total_amount, currency, item_count |
+| `NudgeOnEvents.productViewed` | `product_viewed` | 상품 조회 | product_id, price, currency |
+| `NudgeOnEvents.addToCart` | `add_to_cart` | 장바구니 담기 | product_id, quantity, price, currency |
+| `NudgeOnEvents.checkoutStarted` | `checkout_started` | 결제 시작 | cart_id, item_count, total_amount, currency |
+
+금액은 통화의 기본 단위(원·달러 등) 숫자, 통화는 ISO 4217 코드(`KRW`, `USD` 등)를 사용합니다. 속성은 권장 예시이며 서비스별 속성도 추가할 수 있습니다.
+기존 `track("custom_event", ...)`는 그대로 지원하며 `purchase` 같은 기존 이름을 자동 변환하지 않습니다.
+이름은 대소문자까지 콘솔 설정과 같아야 합니다. 상수 참조 자체는 이벤트를 만들지 않고, `login` 이벤트는 사용자 식별을 대신하지 않습니다.
+`track` 이후 오프라인 저장·배치·재시도는 기존 전송 경로를 사용합니다.
+
+
 ## 설치
 
 게시 전에는 이 저장소를 로컬 경로 또는 검토한 Git 커밋으로 연결하세요.

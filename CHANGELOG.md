@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Add public `NudgeOnEvents` constants for sign-up, login, purchase, product views, cart additions, and checkout starts, matching the console catalog.
+- Document recommended properties and preserve custom event names and the existing track transport.
+
 ## 0.1.3 — publication candidate
 
 - Pin public native cores to 0.2.2 and align podspec/plugin versions.
