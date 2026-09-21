@@ -96,6 +96,38 @@ void main() {
     });
   });
 
+  test('standard event exports preserve wire names and numeric properties',
+      () async {
+    final names = <String, String>{
+      NudgeOnEvents.signUp: 'sign_up',
+      NudgeOnEvents.login: 'login',
+      NudgeOnEvents.purchaseCompleted: 'purchase_completed',
+      NudgeOnEvents.productViewed: 'product_viewed',
+      NudgeOnEvents.addToCart: 'add_to_cart',
+      NudgeOnEvents.checkoutStarted: 'checkout_started',
+      'purchase': 'purchase',
+    };
+    for (final entry in names.entries) {
+      calls.clear();
+      await NudgeOn.track(entry.key, properties: {
+        'order_id': 'order-123',
+        'total_amount': 29000,
+        'currency': 'KRW',
+        'item_count': 1,
+      });
+      expect(calls.single.method, 'track');
+      expect(calls.single.arguments, {
+        'name': entry.value,
+        'properties': {
+          'order_id': 'order-123',
+          'total_amount': 29000,
+          'currency': 'KRW',
+          'item_count': 1
+        },
+      });
+    }
+  });
+
   test('initialize는 config 맵 전달', () async {
     await NudgeOn.initialize(
         const NudgeOnConfig(sdkKey: 'pk', apiHost: 'https://h'));

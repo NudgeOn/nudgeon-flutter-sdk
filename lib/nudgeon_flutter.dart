@@ -2,6 +2,8 @@
 /// 호출 + EventChannel 스트림만 전달한다. 상태는 네이티브 코어에만 (PRD-01A 1.1).
 library nudgeon_flutter;
 
+export 'nudgeon_events.dart';
+
 import 'dart:async';
 import 'package:flutter/services.dart';
 
