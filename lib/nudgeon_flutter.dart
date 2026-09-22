@@ -3,6 +3,7 @@
 library nudgeon_flutter;
 
 export 'nudgeon_events.dart';
+export 'nudgeon_attributes.dart';
 
 import 'dart:async';
 import 'package:flutter/services.dart';
