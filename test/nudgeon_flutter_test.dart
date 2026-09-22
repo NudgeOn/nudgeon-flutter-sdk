@@ -86,6 +86,47 @@ void main() {
     }
   });
 
+  test('standard profile keys preserve custom values and null unsets',
+      () async {
+    await NudgeOn.setUserAttributes({
+      NudgeOnAttributes.firstName: 'Minji',
+      NudgeOnAttributes.lastName: 'Kim',
+      NudgeOnAttributes.email: 'minji@example.com',
+      NudgeOnAttributes.phone: '+821012345678',
+      NudgeOnAttributes.dateOfBirth: '1995-03-15',
+      NudgeOnAttributes.gender: 'F',
+      NudgeOnAttributes.homeCity: 'Seoul',
+      NudgeOnAttributes.country: 'KR',
+      NudgeOnAttributes.language: 'ko',
+      NudgeOnAttributes.timezone: 'Asia/Seoul',
+      NudgeOnAttributes.createdAt: '2026-09-22T00:00:00Z',
+      'score': 0,
+      'enabled': false,
+      'interests': ['music'],
+      'removed': null,
+    });
+    expect(calls.single.method, 'setUserAttributes');
+    expect(calls.single.arguments, {
+      'attrs': {
+        'first_name': 'Minji',
+        'last_name': 'Kim',
+        'email': 'minji@example.com',
+        'phone': '+821012345678',
+        'dob': '1995-03-15',
+        'gender': 'F',
+        'home_city': 'Seoul',
+        'country': 'KR',
+        'language': 'ko',
+        'timezone': 'Asia/Seoul',
+        'created_at': '2026-09-22T00:00:00Z',
+        'score': 0,
+        'enabled': false,
+        'interests': ['music'],
+        'removed': null,
+      }
+    });
+  });
+
   test('track 인자를 맵으로 직렬화해 invoke', () async {
     await NudgeOn.track('product_viewed',
         properties: {'product_id': 'P-1', 'price': 12900});

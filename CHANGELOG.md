@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Use Android core 0.2.8 so explicit null attribute values reach the server as unset operations.
+
+- Add `NudgeOnAttributes` profile keys for names, contact details, birthday, gender, home city, country, language, time zone, and signup date. Use the existing `setUserAttributes` API after `identify`; custom keys and null/unset remain supported.
+
 - Add public `NudgeOnEvents` constants for sign-up, login, purchase, product views, cart additions, and checkout starts, matching the console catalog.
 - Document recommended properties and preserve custom event names and the existing track transport.
 

@@ -3,10 +3,47 @@
 NudgeOn iOS/Android 네이티브 코어를 연결하는 Flutter 플러그인입니다.
 이벤트 수집, 사용자 식별, 푸시 구독과 알림 콜백을 Dart에서 사용합니다.
 
-**0.1.3 배포 후보이며 pub.dev 게시 전입니다.** 네이티브 코어 0.2.2는
+**0.1.3 배포 후보이며 pub.dev 게시 전입니다.** iOS 코어 0.2.2와 Android 코어 0.2.8은
 공개 SPM/Git 태그와 Maven Central에서 내려받습니다. CocoaPods trunk 등록도
 대기 중이므로 아래 고정 podspec 설정이 필요합니다.
 
+
+## 기본 사용자 속성 (다음 릴리스)
+
+`NudgeOnAttributes`는 `setUserAttributes`에 전달할 키 상수입니다. 기존 게시 버전에는 없으므로 릴리스 전에는 문자열 키를 사용할 수 있습니다. SDK 초기화 후 `identify`를 먼저 호출하세요. 식별 전 속성 설정은 현재 지원하지 않습니다.
+
+```dart
+import 'package:nudgeon_flutter/nudgeon_flutter.dart';
+
+await NudgeOn.identify('user-123');
+await NudgeOn.setUserAttributes({
+  NudgeOnAttributes.firstName: 'Minji',
+  NudgeOnAttributes.email: 'minji@example.com',
+  NudgeOnAttributes.dateOfBirth: '1995-03-15',
+  NudgeOnAttributes.country: 'KR',
+  NudgeOnAttributes.timezone: 'Asia/Seoul',
+  'membership_level': 'gold',
+});
+await NudgeOn.setUserAttributes({NudgeOnAttributes.phone: null});
+```
+
+| 상수 | 전송 키 | 예시 |
+|---|---|---|
+| `NudgeOnAttributes.firstName` | `first_name` | `Minji` |
+| `NudgeOnAttributes.lastName` | `last_name` | `Kim` |
+| `NudgeOnAttributes.email` | `email` | `minji@example.com` |
+| `NudgeOnAttributes.phone` | `phone` | `+821012345678` |
+| `NudgeOnAttributes.dateOfBirth` | `dob` | `1995-03-15` |
+| `NudgeOnAttributes.gender` | `gender` | `F` |
+| `NudgeOnAttributes.homeCity` | `home_city` | `Seoul` |
+| `NudgeOnAttributes.country` | `country` | `KR` |
+| `NudgeOnAttributes.language` | `language` | `ko` |
+| `NudgeOnAttributes.timezone` | `timezone` | `Asia/Seoul` |
+| `NudgeOnAttributes.createdAt` | `created_at` | `2026-09-22T00:00:00Z` |
+
+생일은 `YYYY-MM-DD` 문자열, 가입일은 시간대가 있는 RFC 3339 문자열을 사용합니다. 전화번호는 E.164, 국가·언어는 `KR`·`ko` 같은 코드, 시간대는 IANA 이름을 권장합니다. `gender` 권장 코드는 `M`, `F`, `O`, `N`, `P`, `U`입니다. Braze `time_zone`은 기존 NudgeOn 키 `timezone`으로 전달합니다.
+
+값은 자동 수집·변환하지 않으며 커스텀 키도 지원합니다. `null`은 값을 삭제합니다. 현재 속성 전송은 네트워크 요청이며 이벤트 오프라인 큐의 영속 재시도 보장을 제공하지 않습니다. 실패에 대비한 재동기화는 앱에서 수행하세요. 푸시 수신 동의는 `setPushSubscription`을 사용하며 `push_subscribe` 같은 일반 속성으로 변경하지 않습니다.
 
 ## 기본 이벤트 (Standard events — 다음 릴리스)
 
@@ -93,7 +130,7 @@ await opened.cancel();
 
 `flushInterval`은 양의 정수 초, `flushBatchSize`는 양의 정수 건수입니다.
 `appGroup`은 iOS 알림 확장과 공유할 App Group입니다.
-`logLevel`/`setLogLevel`은 iOS 전용이며 Android 코어 0.2.2에서는
+`logLevel`/`setLogLevel`은 iOS 전용이며 Android 코어 0.2.8에서는
 `E_UNSUPPORTED`를 반환합니다. 공통 초기화 설정에서는 생략하세요.
 
 리스너 등록 전의 콜백은 네이티브 메모리 버퍼(최대 20건)에서 이벤트별로
@@ -109,7 +146,7 @@ iOS Push Notifications 권한·APNs 토큰/알림 콜백과 Android Firebase 설
 서비스/intent 연결은 네이티브 설치 가이드를 따르세요.
 
 - [iOS 코어 설치](https://github.com/NudgeOn/nudgeon-ios-sdk/tree/0.2.2)
-- [Android 코어 설치](https://github.com/NudgeOn/nudgeon-android-sdk/tree/0.2.2)
+- [Android 코어 설치](https://github.com/NudgeOn/nudgeon-android-sdk/tree/0.2.8)
 
 앱 화면에서 `registerForPush()`를 호출하세요. Android는 연결된 Activity를
 사용하고 권한 결과를 코어에 전달합니다. 사용자 알림 동의와 서버 공급자
