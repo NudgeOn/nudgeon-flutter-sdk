@@ -1,17 +1,15 @@
 # Changelog
 
-## Unreleased
+## 0.1.3 — publication candidate
 
-- Use Android core 0.2.8 so explicit null attribute values reach the server as unset operations.
+- Align iOS and Android cores to 0.2.9 for transactional SQLite event persistence and one-time legacy JSON migration. Native core publication is required before installing this candidate.
+
 
 - Add `NudgeOnAttributes` profile keys for names, contact details, birthday, gender, home city, country, language, time zone, and signup date. Use the existing `setUserAttributes` API after `identify`; custom keys and null/unset remain supported.
 
 - Add public `NudgeOnEvents` constants for sign-up, login, purchase, product views, cart additions, and checkout starts, matching the console catalog.
 - Document recommended properties and preserve custom event names and the existing track transport.
 
-## 0.1.3 — publication candidate
-
-- Pin public native cores to 0.2.2 and align podspec/plugin versions.
 - Share a native event stream and subscribe to event types only when their Dart listeners exist, retaining other event types in the native core buffer.
 - Reattach pre-initialization listeners and clean up native subscriptions on cancellation/engine detach.
 - Forward initialization options and iOS App Group/log level; preserve numeric attributes 0/1.

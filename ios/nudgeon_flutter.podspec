@@ -11,5 +11,5 @@ Pod::Spec.new do |s|
   s.swift_version    = "5.9"
 
   s.dependency "Flutter"
-  s.dependency "NudgeOnSDK", "= 0.2.2"
+  s.dependency "NudgeOnSDK", "= 0.2.9"
 end

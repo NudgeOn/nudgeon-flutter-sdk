@@ -3,9 +3,7 @@
 NudgeOn iOS/Android 네이티브 코어를 연결하는 Flutter 플러그인입니다.
 이벤트 수집, 사용자 식별, 푸시 구독과 알림 콜백을 Dart에서 사용합니다.
 
-**0.1.3 배포 후보이며 pub.dev 게시 전입니다.** iOS 코어 0.2.2와 Android 코어 0.2.8은
-공개 SPM/Git 태그와 Maven Central에서 내려받습니다. CocoaPods trunk 등록도
-대기 중이므로 아래 고정 podspec 설정이 필요합니다.
+**0.1.3 배포 후보이며 아직 게시 전입니다.** iOS·Android 코어 **0.2.9**의 SQLite 이벤트 큐를 사용합니다. 설치에는 해당 네이티브 태그·Maven Central 패키지가 필요하며, CocoaPods trunk 게시 전에는 아래 고정 podspec 설정이 필요합니다. 공개 레지스트리만 사용하는 신규 앱 검증은 별도 출시 조건입니다.
 
 
 ## 기본 사용자 속성 (다음 릴리스)
@@ -93,12 +91,12 @@ Android 앱의 `minSdk`를 **26 이상**, Kotlin을 **2.1.20 이상**으로 설�
 iOS 앱과 확장 프로그램의 deployment target은 **15.0 이상**입니다.
 
 `ios/Podfile`의 앱 target 안에 다음을 추가하고 `pod install`을 실행하세요.
-이 URL의 podspec은 공개 SDK **0.2.2 Git 태그**를 내려받습니다.
+이 URL의 podspec은 공개 SDK **0.2.9 Git 태그**를 내려받습니다.
 
 ```ruby
 platform :ios, '15.0'
 target 'Runner' do
-  pod 'NudgeOnSDK', :podspec => 'https://raw.githubusercontent.com/NudgeOn/nudgeon-ios-sdk/87da4258f7b8cbf27041d6b096815158cc0febee/NudgeOnSDK.podspec'
+  pod 'NudgeOnSDK', :podspec => 'https://raw.githubusercontent.com/NudgeOn/nudgeon-ios-sdk/0.2.9/NudgeOnSDK.podspec'
   # 기존 Flutter 설정 유지
 end
 ```
@@ -130,7 +128,7 @@ await opened.cancel();
 
 `flushInterval`은 양의 정수 초, `flushBatchSize`는 양의 정수 건수입니다.
 `appGroup`은 iOS 알림 확장과 공유할 App Group입니다.
-`logLevel`/`setLogLevel`은 iOS 전용이며 Android 코어 0.2.8에서는
+`logLevel`/`setLogLevel`은 iOS 전용이며 Android 코어 0.2.9에서는
 `E_UNSUPPORTED`를 반환합니다. 공통 초기화 설정에서는 생략하세요.
 
 리스너 등록 전의 콜백은 네이티브 메모리 버퍼(최대 20건)에서 이벤트별로
@@ -145,8 +143,8 @@ await opened.cancel();
 iOS Push Notifications 권한·APNs 토큰/알림 콜백과 Android Firebase 설정,
 서비스/intent 연결은 네이티브 설치 가이드를 따르세요.
 
-- [iOS 코어 설치](https://github.com/NudgeOn/nudgeon-ios-sdk/tree/0.2.2)
-- [Android 코어 설치](https://github.com/NudgeOn/nudgeon-android-sdk/tree/0.2.8)
+- [iOS 코어 설치](https://github.com/NudgeOn/nudgeon-ios-sdk/tree/0.2.9)
+- [Android 코어 설치](https://github.com/NudgeOn/nudgeon-android-sdk/tree/0.2.9)
 
 앱 화면에서 `registerForPush()`를 호출하세요. Android는 연결된 Activity를
 사용하고 권한 결과를 코어에 전달합니다. 사용자 알림 동의와 서버 공급자
