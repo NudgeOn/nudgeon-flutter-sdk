@@ -19,3 +19,18 @@ registration. A successful compile alone is not a runtime PASS.
 The fixture adopts Flutter's UIScene lifecycle for iOS 27:
 https://docs.flutter.dev/release/breaking-changes/uiscenedelegate
 Its QA channel and synthetic key must not be copied into a production app.
+
+## 0.2.9 candidate and registry gate
+
+The current candidate pins both native cores to 0.2.9. The default probe uses
+the local wrapper and public native packages, with an explicit tagged iOS
+podspec while trunk publication is pending. After all packages are published:
+
+```sh
+python3 tests/consumer/prepare.py /tmp/nudgeon-registry-consumer --registry
+```
+
+This mode resolves the wrapper from npm/pub.dev and the iOS core from CocoaPods
+trunk, without local package or podspec overrides. Build both Android and iOS
+outputs before treating registry-only installation as verified. Earlier core
+versions and Xcode findings above describe historical validation only.
