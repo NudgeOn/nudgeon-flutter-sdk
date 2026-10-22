@@ -3,7 +3,7 @@
 `python3 tests/consumer/prepare.py /tmp/nudgeon-flutter-consumer-unique`
 creates a new Flutter app (never overwrites a directory). CI uses Flutter 3.38.5;
 local validation used 3.38.4. Android minSdk is 26; iOS deployment target is 15.
-The source plugin is local; native core 0.2.2 resolves from Maven Central and the
+The source plugin is local; native core 0.2.9 resolves from Maven Central and the
 public iOS Git tag using an immutable podspec URL (CocoaPods trunk pending).
 
 CI builds Android arm64 debug and iOS arm64 simulator apps. `swift test` covers
